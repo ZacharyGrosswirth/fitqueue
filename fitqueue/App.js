@@ -1,6 +1,7 @@
 import * as React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createStackNavigator } from "@react-navigation/stack";
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faHome } from '@fortawesome/free-solid-svg-icons'
@@ -14,12 +15,20 @@ import Queues from "./screens/queues";
 import Workouts from "./screens/workouts";
 import Gyms from "./screens/gym";
 import Settings from "./screens/settings";
+import Login from "./screens/login";
+import Signup from "./screens/signup";
+import ForgotPassword from "./screens/forgotpassword";
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 const App = () => {
+
+  const loggedIn = false;
+
   return (
     <NavigationContainer>
+      {loggedIn ? (
       <Tab.Navigator
         screenOptions={{
           tabBarStyle: { backgroundColor: "#36BCC0" },
@@ -80,6 +89,25 @@ const App = () => {
           }}
         />
       </Tab.Navigator>
+    ) : (
+      <Stack.Navigator initialRouteName="Login">
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Signup"
+          component={Signup}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ForgotPassword"
+          component={ForgotPassword}
+          options={{ headerShown: false }}
+        />
+      </Stack.Navigator>
+    )}
     </NavigationContainer>
   );
 };
