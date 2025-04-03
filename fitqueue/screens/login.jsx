@@ -13,6 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  
   const [passwordVisible, setPasswordVisible] = useState(false);
 
   const navigation = useNavigation();
@@ -85,7 +86,7 @@ const Login = () => {
           New User?
           <TouchableOpacity
             onPress={() => {
-              setCreate(false);
+              navigation.navigate("SignUp");
             }}
           >
             <Text style={{ color: "#61A0DA", marginBottom: -4 }}>

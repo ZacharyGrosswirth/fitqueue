@@ -4,30 +4,79 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
-  Keyboard,
   StyleSheet,
   Image,
-  KeyboardAvoidingView,
-  Platform,
-  Modal,
-  Button,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Dropdown } from "react-native-element-dropdown";
+import { Icon } from "react-native-elements";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [verifyPassword, setVerifyPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [birthday, setBirthday] = useState(null);
+  const [gender, setGender] = useState(null);
+
+  const [isFocus, setIsFocus] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [verifyPasswordVisible, setVerifyPasswordVisible] = useState(false);
 
   const navigation = useNavigation();
 
+  const genders = [
+    { label: "Male", value: "Male" },
+    { label: "Female", value: "Female" },
+    { label: "Other", value: "Other" },
+    { label: "Prefer Not To Say", value: "Prefer Not To Say" },
+  ];
+
+  const handleSignUpPress = async () => {
+    // const signUpResult = await handleSignUp(
+    //   email,
+    //   password,
+    //   role,
+    //   donorDriveLink,
+    //   expoPushToken
+    // );
+    // if (signUpResult === "success") {
+    //   setSignUpField(false);
+    // } else {
+    //   setSignUpField(true);
+    // }
+  };
+
   return (
     <View style={styles.container}>
-      {/* <View style={styles.loginbox}>
+      <Image
+        style={{ marginBottom: 10 }}
+        source={require("../assets/signup_text.png")}
+      />
+      <Text style={styles.topText}>
+        Enter information about yourself to complete your FitQueue account
+      </Text>
+      <View style={styles.loginbox}>
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.inputTop}
+            value={firstName}
+            onChangeText={(text) => setFirstName(text)}
+            placeholder="First Name"
+            autoCapitalize="words"
+          />
+
+          <TextInput
+            style={styles.inputTop}
+            value={lastName}
+            onChangeText={(text) => setLastName(text)}
+            placeholder="Last Name"
+            autoCapitalize="words"
+          />
+
+          <TextInput
+            style={styles.inputMiddle}
             value={email}
             onChangeText={(text) => setEmail(text)}
             placeholder="Email Address"
@@ -35,123 +84,91 @@ const Signup = () => {
             autoCapitalize="none"
           />
 
-          <View style={styles.passwordContainer}>
-            <TextInput
-              style={styles.inputMiddle}
-              value={password}
-              onChangeText={(text) => setPassword(text)}
-              placeholder="Password"
-              secureTextEntry={!passwordVisible}
-            />
-            <TouchableOpacity
-              onPress={() => setPasswordVisible(!passwordVisible)}
-              style={styles.iconContainer}
-            >
-              <Icon
-                name={passwordVisible ? "visibility-off" : "visibility"}
-                type="material" // specify the icon set, 'material' is the default
-                size={24}
-                color="grey"
-              />
-            </TouchableOpacity>
-          </View>
-
-          {!create && (
-            <TextInput
-              style={styles.inputBottom}
-              value={donorDriveLink}
-              onChangeText={setDonorDriveLink}
-              placeholder="Enter Your Donor Drive Link"
-            />
-          )}
-
-          {!create && (
-            <Dropdown
-              style={styles.dropdown}
-              placeholderStyle={styles.placeholderStyle}
-              selectedTextStyle={styles.selectedTextStyle}
-              inputSearchStyle={styles.inputSearchStyle}
-              iconStyle={styles.iconStyle}
-              data={roles}
-              search
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              placeholder={!isFocus ? "Select Your Role" : "..."}
-              searchPlaceholder="Search..."
-              value={role}
-              onChange={(item) => {
-                setRole(item.value);
-                setIsFocus(false); // This ensures the dropdown loses focus after selection
-              }}
-            />
-          )}
+          <Dropdown
+            style={styles.dropdown}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            inputSearchStyle={styles.inputSearchStyle}
+            iconStyle={styles.iconStyle}
+            data={genders}
+            search
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            placeholder={!isFocus ? "Gender" : "..."}
+            searchPlaceholder="Search..."
+            value={gender}
+            onChange={(item) => {
+              setGender(item.value);
+              setIsFocus(false);
+            }}
+          />
         </View>
 
-        {!create && (
-          <>
-            <TouchableOpacity
-              style={styles.createAccountButton}
-              onPress={async () => {
-                await handleSignUpPress();
-              }}
-            >
-              <Text style={styles.buttonText}>Sign Up</Text>
-            </TouchableOpacity>
-          </>
-        )}
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.inputMiddle}
+            value={password}
+            onChangeText={(text) => setPassword(text)}
+            placeholder="Password"
+            secureTextEntry={!passwordVisible}
+          />
+          <TouchableOpacity
+            onPress={() => setPasswordVisible(!passwordVisible)}
+            style={styles.iconContainer}
+          >
+            <Icon
+              name={passwordVisible ? "visibility-off" : "visibility"}
+              type="material"
+              size={24}
+              color="grey"
+            />
+          </TouchableOpacity>
+        </View>
 
-        {create && (
-          <>
-            <TouchableOpacity
-              style={styles.loginButton}
-              onPress={handleLoginPress}
-            >
-              <Text style={styles.buttonText}>Log In</Text>
-            </TouchableOpacity>
-          </>
-        )}
+        <View style={[styles.passwordContainer, {marginTop: 1}]}>
+          <TextInput
+            style={styles.inputMiddle}
+            value={verifyPassword}
+            onChangeText={(text) => setVerifyPassword(text)}
+            placeholder="Verify Password"
+            secureTextEntry={!verifyPasswordVisible}
+          />
+          <TouchableOpacity
+            onPress={() => setVerifyPasswordVisible(!verifyPasswordVisible)}
+            style={styles.iconContainer}
+          >
+            <Icon
+              name={verifyPasswordVisible ? "visibility-off" : "visibility"}
+              type="material"
+              size={24}
+              color="grey"
+            />
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity
+          style={styles.createAccountButton}
+          onPress={async () => {
+            await handleSignUpPress();
+          }}
+        >
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </TouchableOpacity>
 
         <View style={styles.divider} />
 
-        <TouchableOpacity onPress={handleForgotPassword}>
-          <Text style={styles.forgotPassword}>Forgot password?</Text>
-        </TouchableOpacity>
-
-        {create && (
-          <Text style={styles.signUp}>
-            New User?
-            <TouchableOpacity
-              style={{ marginBottom: -3 }}
-              onPress={() => {
-                setCreate(false);
-              }}
-            >
-              <Text style={{ color: "#61A0DA" }}> Sign Up!</Text>
-            </TouchableOpacity>
-          </Text>
-        )}
-        {!create && (
-          <View>
-            <TouchableOpacity onPress={openDDModal}>
-              <Text style={styles.DDlink}>
-                Where do I find my DonorDrive Link?
-              </Text>
-            </TouchableOpacity>
-            <Text style={styles.signUp}>
-              Already A User?
-              <TouchableOpacity
-                style={{ marginBottom: -3 }}
-                onPress={() => {
-                  setCreate(true);
-                }}
-              >
-                <Text style={{ color: "#61A0DA" }}> Log In!</Text>
-              </TouchableOpacity>
-            </Text>
-          </View>
-        )}
-      </View> */}
+        <Text style={styles.signUp}>
+          Already A User?
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("Login");
+            }}
+          >
+            <Text style={{ color: "#61A0DA", marginBottom: -4 }}> Log In!</Text>
+          </TouchableOpacity>
+        </Text>
+      </View>
     </View>
   );
 };
@@ -163,23 +180,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  text: {
-    fontSize: 32,
-    fontWeight: "bold",
-  },
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#233563",
+    backgroundColor: "#323232",
     width: "100%",
   },
   logoContainer: {
     marginBottom: 30,
   },
   loginbox: {
-    width: "80%",
+    width: "70%",
     backgroundColor: "#F2EFEE",
     borderRadius: 10,
     padding: 20,
@@ -201,6 +209,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "span",
     position: "relative",
+    marginTop: -5,
+    marginBottom: 15,
   },
   inputMiddle: {
     height: 40,
@@ -232,11 +242,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   createAccountButton: {
-    backgroundColor: "#E2883C",
+    backgroundColor: "#36BCC0",
     padding: 15,
     borderRadius: 5,
     alignSelf: "stretch",
     marginBottom: 10,
+    marginTop: 20,
   },
   buttonText: {
     color: "white",
@@ -294,6 +305,7 @@ const styles = StyleSheet.create({
   },
   placeholderStyle: {
     fontSize: 16,
+    color: "#AFAEB0",
   },
   selectedTextStyle: {
     fontSize: 16,
@@ -338,5 +350,11 @@ const styles = StyleSheet.create({
     textAlign: "left",
     alignSelf: "stretch",
     marginBottom: 5,
+  },
+  topText: {
+    width: "70%",
+    textAlign: "center",
+    marginBottom: 15,
+    color: "white",
   },
 });
