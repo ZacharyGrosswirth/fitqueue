@@ -1,8 +1,8 @@
 import React from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 
-import WorkoutItem from "../components/workout_config.jsx";
 import Header from "../components/header.jsx";
+import WorkoutItem from "../components/workout_config.jsx";
 
 const Home = () => {
   return (
@@ -39,7 +39,6 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     backgroundColor: "#FFFFFF",
   },
 });
