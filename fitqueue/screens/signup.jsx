@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 5,
     alignSelf: "stretch",
-    marginBottom: 10,
+    marginBottom: 5,
     marginTop: 20,
   },
   buttonText: {

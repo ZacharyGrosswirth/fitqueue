@@ -24,7 +24,7 @@ const Stack = createStackNavigator();
 
 const App = () => {
 
-  const loggedIn = false;
+  const loggedIn = true;
 
   return (
     <NavigationContainer>
@@ -46,6 +46,13 @@ const App = () => {
             tabBarIcon: ({ color, size }) => (
               <FontAwesomeIcon icon={faHome} color={color} size={size}/>
             ),
+            headerStyle: {
+              backgroundColor: "#1f1f1f",
+              borderBottomWidth: 0,
+            },
+            headerTintColor: "white",
+            headerShadowVisible: false,
+            headerBackTitleVisible: false,
           }}
         />
         <Tab.Screen
