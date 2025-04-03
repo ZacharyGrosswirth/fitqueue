@@ -2,30 +2,30 @@ import React from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 
 import Header from "../components/header.jsx";
-import WorkoutItem from "../components/workout_config.jsx";
+import HomeItem from "../components/home_config.jsx";
 
 const Home = () => {
   return (
     <View style={styles.container}>
       <Header gym="Southwest Recreation Center" text="Today's Workout"/>
       <ScrollView>
-        <WorkoutItem
+        <HomeItem
           name="Leg Press"
           waitTime="20 minutes"
         />
-        <WorkoutItem
+        <HomeItem
           name="Squat"
           waitTime="20 minutes"
         />
-        <WorkoutItem
+        <HomeItem
           name="Leg Extension"
           waitTime="20 minutes"
         />
-        <WorkoutItem
+        <HomeItem
           name="Leg Curl"
           waitTime="20 minutes"
         />
-        <WorkoutItem
+        <HomeItem
           name="Calf Raises"
           waitTime="20 minutes"
         />
