@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,27 +9,66 @@ import {
 } from "react-native";
 import { Icon } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
+import { signInWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail } from "firebase/auth";
+//import AsyncStorage from "@react-native-async-storage/async-storage";
+import { auth } from "../firebase/firebaseConfig.js";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+  const [errorMessage, setErrorMessage] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
 
   const navigation = useNavigation();
 
-  const handleLoginPress = async () => {
-    // const loginResult = await handleLogin(email, password);
-    // if (loginResult === "success") {
-    //   setLoginFailed(false);
-    // } else {
-    //   setLoginFailed(true);
-    // }
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        navigation.navigate("Home");
+      }
+    });
+    return unsubscribe;
+  }, [navigation]);
+
+  const handleLogin = async () => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      // await AsyncStorage.setItem(
+      //   "user",
+      //   JSON.stringify({
+      //     uid: user.uid,
+      //     email: user.email,
+      //   })
+      // );
+    } catch (error) {
+      setErrorMessage(error.message);
+      console.error("Login error:", error);
+    }
   };
 
-  const handleForgotPassword = () => {
-    navigation.navigate("ForgotPassword");
+  const handlePasswordReset = async () => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setErrorMessage("");
+    } catch (error) {
+      setErrorMessage(error.message);
+      console.error("Password reset error:", error);
+    }
   };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        navigation.navigate("Home");
+      }
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <View style={styles.container}>
@@ -72,13 +111,18 @@ const Login = () => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleLoginPress}>
+        <TouchableOpacity
+          style={styles.loginButton}
+          onPress={async () => {
+            await handleLogin();
+          }}
+        >
           <Text style={styles.buttonText}>Log In</Text>
         </TouchableOpacity>
 
         <View style={styles.divider} />
 
-        <TouchableOpacity onPress={handleForgotPassword}>
+        <TouchableOpacity onPress={handlePasswordReset}>
           <Text style={styles.forgotPassword}>Forgot password?</Text>
         </TouchableOpacity>
 
@@ -96,6 +140,7 @@ const Login = () => {
           </TouchableOpacity>
         </Text>
       </View>
+      {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
     </View>
   );
 };
@@ -110,17 +155,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#323232",
     width: "100%",
   },
-  logoContainer: {
-    marginBottom: 30,
-  },
   loginbox: {
     width: "70%",
     backgroundColor: "#F2EFEE",
     borderRadius: 10,
     padding: 20,
-  },
-  inputContainer: {
-    marginBottom: 20,
   },
   inputTop: {
     height: 40,
@@ -150,15 +189,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: "5%",
   },
-  inputBottom: {
-    height: 40,
-    borderColor: "black",
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    backgroundColor: "#D9D9D9",
-    marginTop: 15,
-  },
   loginButton: {
     backgroundColor: "#36BCC0",
     padding: 15,
@@ -166,13 +196,6 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
     marginBottom: 5,
     marginTop: 10,
-  },
-  createAccountButton: {
-    backgroundColor: "#E2883C",
-    padding: 15,
-    borderRadius: 5,
-    alignSelf: "stretch",
-    marginBottom: 10,
   },
   buttonText: {
     color: "white",
@@ -189,11 +212,6 @@ const styles = StyleSheet.create({
     color: "#61A0DA",
     textAlign: "center",
   },
-  DDlink: {
-    color: "#61A0DA",
-    textAlign: "center",
-    marginBottom: 2,
-  },
   signUp: {
     color: "black",
     textAlign: "center",
@@ -204,75 +222,8 @@ const styles = StyleSheet.create({
     height: 100,
     marginBottom: 10,
   },
-  logoSmall: {
-    width: 350,
-    height: 225,
-    marginBottom: 50,
-    marginTop: 50,
-  },
-  errorMessage: {
-    color: "white",
-    textAlign: "center",
+  error: {
+    color: "red",
     marginTop: 15,
-    marginBottom: 15,
-  },
-  dropdown: {
-    marginTop: 15,
-    height: 40,
-    borderColor: "black",
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    backgroundColor: "#D9D9D9",
-  },
-  icon: {
-    marginRight: 5,
-  },
-  placeholderStyle: {
-    fontSize: 16,
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 22,
-  },
-  modalHeader: {
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  modalText: {
-    fontSize: 14,
-    textAlign: "left",
-    alignSelf: "stretch",
-    marginBottom: 5,
   },
 });

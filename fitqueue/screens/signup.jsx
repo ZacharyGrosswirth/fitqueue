@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,19 +10,29 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { Dropdown } from "react-native-element-dropdown";
 import { Icon } from "react-native-elements";
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+} from "firebase/auth";
+//import AsyncStorage from "@react-native-async-storage/async-storage";
+import { auth, db } from "../firebase/firebaseConfig.js";
+import { doc, setDoc } from "firebase/firestore";
+// import * as ImagePicker from "expo-image-picker";
+// import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [name, setName] = useState("");
   const [birthday, setBirthday] = useState(null);
   const [gender, setGender] = useState(null);
+  const [gym, setGym] = useState(null);
 
   const [isFocus, setIsFocus] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [verifyPasswordVisible, setVerifyPasswordVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const navigation = useNavigation();
 
@@ -33,20 +43,98 @@ const Signup = () => {
     { label: "Prefer Not To Say", value: "Prefer Not To Say" },
   ];
 
-  const handleSignUpPress = async () => {
-    // const signUpResult = await handleSignUp(
-    //   email,
-    //   password,
-    //   role,
-    //   donorDriveLink,
-    //   expoPushToken
-    // );
-    // if (signUpResult === "success") {
-    //   setSignUpField(false);
-    // } else {
-    //   setSignUpField(true);
-    // }
+  const gyms = [
+    { label: "Crunch", value: "Crunch" },
+    { label: "Southwest", value: "Southwest" },
+    { label: "Student Rec", value: "Student Rec" },
+    { label: "Other", value: "Other" },
+  ];
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        navigation.navigate("Home");
+      }
+    });
+    return unsubscribe;
+  }, [navigation]);
+
+  const handleSignUp = async () => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      // await AsyncStorage.setItem(
+      //   "user",
+      //   JSON.stringify({
+      //     uid: user.uid,
+      //     email: user.email,
+      //   })
+      // );
+      // const imageUri = await pickImage();
+      // let imageURL = "";
+      // if (imageUri) {
+      //   imageURL = await uploadImageAsync(imageUri, user.uid);
+      // }
+      await setDoc(doc(db, "Users", user.uid), {
+        birthday: birthday,
+        email: email,
+        gender: gender,
+        gym: gym,
+        name: name,
+        // picture: imageURL,
+      });
+      await setDoc(doc(db, "Users", user.uid, "Workouts", "Push"), {
+        createdAt: new Date().toISOString(),
+      });
+      await setDoc(doc(db, "Users", user.uid, "Workouts", "Pull"), {
+        createdAt: new Date().toISOString(),
+      });
+      await setDoc(doc(db, "Users", user.uid, "Workouts", "Legs"), {
+        createdAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      setErrorMessage(error.message);
+      console.error("Sign Up error:", error);
+    }
   };
+
+  // const pickImage = async () => {
+  //   const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  //   if (status !== "granted") {
+  //     alert("Sorry, we need camera roll permissions to make this work!");
+  //     return null;
+  //   }
+
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //     allowsEditing: true,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //   });
+
+  //   if (result.cancelled) {
+  //     return null;
+  //   }
+
+  //   return result.uri;
+  // };
+
+  // const uploadImageAsync = async (uri, userId) => {
+  //   const response = await fetch(uri);
+  //   const blob = await response.blob();
+
+  //   const storage = getStorage();
+  //   const storageRef = ref(storage, `userProfilePictures/${userId}`);
+
+  //   await uploadBytes(storageRef, blob);
+
+  //   const downloadURL = await getDownloadURL(storageRef);
+  //   return downloadURL;
+  // };
 
   return (
     <View style={styles.container}>
@@ -62,16 +150,8 @@ const Signup = () => {
           <TextInput
             style={styles.inputTop}
             value={firstName}
-            onChangeText={(text) => setFirstName(text)}
-            placeholder="First Name"
-            autoCapitalize="words"
-          />
-
-          <TextInput
-            style={styles.inputTop}
-            value={lastName}
-            onChangeText={(text) => setLastName(text)}
-            placeholder="Last Name"
+            onChangeText={(text) => setName(text)}
+            placeholder="Name"
             autoCapitalize="words"
           />
 
@@ -82,6 +162,34 @@ const Signup = () => {
             placeholder="Email Address"
             keyboardType="email-address"
             autoCapitalize="none"
+          />
+
+          <TextInput
+            style={[styles.inputMiddle, { marginTop: 15 }]}
+            value={birthday}
+            onChangeText={(text) => setBirthday(text)}
+            placeholder="Birthday (MM/DD/YYYY)"
+            autoCapitalize="words"
+          />
+
+          <Dropdown
+            style={styles.dropdown}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            inputSearchStyle={styles.inputSearchStyle}
+            iconStyle={styles.iconStyle}
+            data={gyms}
+            search
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            placeholder={!isFocus ? "Gym" : "..."}
+            searchPlaceholder="Search..."
+            value={gym}
+            onChange={(item) => {
+              setGym(item.value);
+              setIsFocus(false);
+            }}
           />
 
           <Dropdown
@@ -126,7 +234,7 @@ const Signup = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={[styles.passwordContainer, {marginTop: 1}]}>
+        <View style={[styles.passwordContainer, { marginTop: 1 }]}>
           <TextInput
             style={styles.inputMiddle}
             value={verifyPassword}
@@ -150,7 +258,7 @@ const Signup = () => {
         <TouchableOpacity
           style={styles.createAccountButton}
           onPress={async () => {
-            await handleSignUpPress();
+            await handleSignUp();
           }}
         >
           <Text style={styles.buttonText}>Sign Up</Text>
@@ -169,6 +277,7 @@ const Signup = () => {
           </TouchableOpacity>
         </Text>
       </View>
+      {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
     </View>
   );
 };
@@ -225,22 +334,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: "5%",
   },
-  inputBottom: {
-    height: 40,
-    borderColor: "black",
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    backgroundColor: "#D9D9D9",
-    marginTop: 15,
-  },
-  loginButton: {
-    backgroundColor: "#E2883C",
-    padding: 15,
-    borderRadius: 5,
-    alignSelf: "stretch",
-    marginBottom: 10,
-  },
   createAccountButton: {
     backgroundColor: "#36BCC0",
     padding: 15,
@@ -260,36 +353,10 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
     marginVertical: 12,
   },
-  forgotPassword: {
-    color: "#61A0DA",
-    textAlign: "center",
-  },
-  DDlink: {
-    color: "#61A0DA",
-    textAlign: "center",
-    marginBottom: 2,
-  },
   signUp: {
     color: "black",
     textAlign: "center",
     marginTop: 5,
-  },
-  logoBig: {
-    width: 350,
-    height: 225,
-    marginBottom: 50,
-  },
-  logoSmall: {
-    width: 350,
-    height: 225,
-    marginBottom: 50,
-    marginTop: 50,
-  },
-  errorMessage: {
-    color: "white",
-    textAlign: "center",
-    marginTop: 15,
-    marginBottom: 15,
   },
   dropdown: {
     marginTop: 15,
@@ -318,43 +385,14 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 16,
   },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 22,
-  },
-  modalHeader: {
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  modalText: {
-    fontSize: 14,
-    textAlign: "left",
-    alignSelf: "stretch",
-    marginBottom: 5,
-  },
   topText: {
     width: "70%",
     textAlign: "center",
     marginBottom: 15,
     color: "white",
+  },
+  error: {
+    color: "red",
+    marginTop: 15,
   },
 });
