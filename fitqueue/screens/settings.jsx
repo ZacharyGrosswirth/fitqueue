@@ -16,15 +16,16 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { doc, getDoc } from "firebase/firestore";
 // import * as ImagePicker from "expo-image-picker";
 // import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { userName, email, gender, gym, birthday } from "../firebase/grabData.js";
 
 const Settings = () => {
   const [isDarkMode, setIsDarkMode] = React.useState(false);
-  const [email, setEmail] = useState("");
-  // const [picture, setPicture] = useState(null);
-  const [name, setName] = useState("");
-  const [birthday, setBirthday] = useState("");
-  const [gender, setGender] = useState("");
-  const [gym, setGym] = useState("");
+  // const [email, setEmail] = useState("");
+  // // const [picture, setPicture] = useState(null);
+  // const [name, setName] = useState("");
+  // const [birthday, setBirthday] = useState("");
+  // const [gender, setGender] = useState("");
+  // const [gym, setGym] = useState("");
 
   const toggleSwitch = () => setIsDarkMode((previousState) => !previousState);
 
@@ -38,27 +39,27 @@ const Settings = () => {
     }
   };
 
-  const getUserInfo = async () => {
-    try {
-      const userDocRef = doc(db, "Users", auth.currentUser.uid);
-      const userDocSnap = await getDoc(userDocRef);
+  // const getUserInfo = async () => {
+  //   try {
+  //     const userDocRef = doc(db, "Users", auth.currentUser.uid);
+  //     const userDocSnap = await getDoc(userDocRef);
 
-      if (userDocSnap.exists()) {
-        console.log("User data:", userDocSnap.data());
-        setEmail(userDocSnap.data().email);
-        setName(userDocSnap.data().name);
-        setBirthday(userDocSnap.data().birthday);
-        setGender(userDocSnap.data().gender);
-        setGym(userDocSnap.data().gym);
-        // setPicture(userDocSnap.data().picture);
-      } else {
-        console.log("No such document!");
-        return null;
-      }
-    } catch (error) {
-      console.error("Error fetching user document:", error);
-    }
-  };
+  //     if (userDocSnap.exists()) {
+  //       console.log("User data:", userDocSnap.data());
+  //       setEmail(userDocSnap.data().email);
+  //       setName(userDocSnap.data().name);
+  //       setBirthday(userDocSnap.data().birthday);
+  //       setGender(userDocSnap.data().gender);
+  //       setGym(userDocSnap.data().gym);
+  //       // setPicture(userDocSnap.data().picture);
+  //     } else {
+  //       console.log("No such document!");
+  //       return null;
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching user document:", error);
+  //   }
+  // };
 
   // const pickImage = async () => {
   //     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -94,16 +95,16 @@ const Settings = () => {
   //     return downloadURL;
   //   };
 
-  useEffect(() => {
-    getUserInfo();
-  }, []);
+  // useEffect(() => {
+  //   getUserInfo();
+  // }, []);
 
   return (
     <View style={styles.container}>
       <Header gym={gym} text="Settings" />
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <Text style={[styles.sectionHeader, { marginTop: 0 }]}>Name</Text>
-        <Text style={styles.sectionText}>{name}</Text>
+        <Text style={styles.sectionText}>{userName}</Text>
         <Text style={styles.sectionHeader}>Email</Text>
         <Text style={styles.sectionText}>{email}</Text>
         <Text style={styles.sectionHeader}>Birthday</Text>

@@ -1,20 +1,72 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { auth, db } from "../firebase/firebaseConfig.js";
+import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import "firebase/firestore";
+import { userName, email, gender, gym, birthday } from "../firebase/grabData.js";
 
 const HomeItem = ({
   name = "Leg Press",
-  waitTime = "20 minutes"
+  waitTime = "20 minutes",
 }) => {
+  // 0: Join Queue, 1: Queue Joined, 2: Using Equipment
+  const [queueState, setQueueState] = useState(0);
+
+  const toggleQueue = async () => {
+    console.log(`Current state: ${queueState} for ${name}...`);
+    try {
+      const queueRef = doc(db, "Queues", gym);
+      
+      if (queueState === 0) {
+        await updateDoc(queueRef, {
+          [name]: arrayUnion(userName)
+        });
+        setQueueState(1);
+      } else if (queueState === 1) {
+        setQueueState(2);
+      } else if (queueState === 2) {
+        await updateDoc(queueRef, {
+          [name]: arrayRemove(userName)
+        });
+        setQueueState(0);
+      }
+    } catch (error) {
+      console.error("Error toggling queue: ", error);
+    }
+  };
+
+  let buttonLabel;
+  let buttonStyle;
+  let buttonTextStyle;
+  if (queueState === 0) {
+    buttonLabel = "Join Queue";
+    buttonStyle = styles.notJoinedButton;
+    buttonTextStyle = styles.notJoinedButtonText;
+  } else if (queueState === 1) {
+    buttonLabel = "Queue Joined";
+    buttonStyle = styles.joinedButton;
+    buttonTextStyle = styles.joinedButtonText;
+  } else if (queueState === 2) {
+    buttonLabel = "Using Equipment";
+    buttonStyle = styles.usingEquipmentButton;
+    buttonTextStyle = styles.usingEquipmentButtonText;
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.itemContainer}>
         <View style={styles.leftContainer}>
           <Text style={styles.exerciseName}>{name}</Text>
-          <View style={styles.queuePill}>
-            <Text style={styles.queuePillText}>Queue Joined</Text>
-          </View>
+          <TouchableOpacity
+            onPress={toggleQueue}
+            style={[styles.joinButton, buttonStyle]}
+          >
+            <Text style={[styles.joinButtonText, buttonTextStyle]}>
+              {buttonLabel}
+            </Text>
+          </TouchableOpacity>
           <Text style={styles.detailText}>Wait: {waitTime}</Text>
-          {/* add the sets+reps+weight under */}
+          {/* Additional details (e.g., sets+reps+weight) can go here */}
         </View>
 
         <View style={styles.leftHalf}>
@@ -39,53 +91,70 @@ const HomeItem = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    height: 100,
+    width: "100%",
+    minHeight: 100,
     backgroundColor: "#fff",
     borderColor: "#ccc",
     borderTopWidth: 1,
     borderBottomWidth: 1,
     paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingHorizontal: 16
   },
   itemContainer: {
     flexDirection: "row",
     alignItems: "flex-start",
-    flex: 1,
+    flex: 1
   },
   leftContainer: {
     flex: 1,
-    paddingRight: 10,
+    paddingRight: 10
   },
   exerciseName: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 4,
-    color: "black",
+    color: "black"
   },
-  queuePill: {
-    backgroundColor: "#1abc9c",
+  joinButton: {
     borderRadius: 12,
-    paddingHorizontal: 8,
     paddingVertical: 2,
-    alignSelf: "flex-start",
-    marginBottom: 4,
+    paddingHorizontal: 8,
+    alignItems: "center",
+    marginVertical: 2,
   },
-  queuePillText: {
-    color: "#fff",
-    fontSize: 12,
+  notJoinedButton: {
+    backgroundColor: "lightgrey"
+  },
+  joinedButton: {
+    backgroundColor: "#1abc9c",
+  },
+  usingEquipmentButton: {
+    backgroundColor: "orange"
+  },
+  joinButtonText: {
+    fontSize: 14,
+    textAlign: "center"
+  },
+  notJoinedButtonText: {
+    color: "black"
+  },
+  joinedButtonText: {
+    color: "white"
+  },
+  usingEquipmentButtonText: {
+    color: "white"
   },
   detailText: {
     fontSize: 14,
     color: "#555",
-    marginBottom: 2,
+    marginBottom: 2
   },
   leftButton: {
     backgroundColor: "lightgrey",
     borderRadius: 6,
     paddingVertical: 6,
     marginVertical: 2,
-    alignItems: "center",
+    alignItems: "center"
   },
   rightButton: {
     backgroundColor: "lightgrey",
@@ -96,22 +165,22 @@ const styles = StyleSheet.create({
     height: 68,
     justifyContent: "center",
     textAlign: "center",
-    width: "90%",
+    width: "90%"
   },
   buttonText: {
     fontSize: 14,
     color: "black",
-    textAlign: 'center',
+    textAlign: "center"
   },
   leftHalf: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "center"
   },
   rightHalf: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
-  },
+    alignItems: "center"
+  }
 });
 
 export default HomeItem;

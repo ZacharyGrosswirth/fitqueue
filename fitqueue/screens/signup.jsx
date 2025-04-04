@@ -88,13 +88,13 @@ const Signup = () => {
         // picture: imageURL,
       });
       await setDoc(doc(db, "Users", user.uid, "Workouts", "Push"), {
-        createdAt: new Date().toISOString(),
+        exercises: [],
       });
       await setDoc(doc(db, "Users", user.uid, "Workouts", "Pull"), {
-        createdAt: new Date().toISOString(),
+        exercises: [],
       });
       await setDoc(doc(db, "Users", user.uid, "Workouts", "Legs"), {
-        createdAt: new Date().toISOString(),
+        exercises: [],
       });
     } catch (error) {
       setErrorMessage(error.message);
