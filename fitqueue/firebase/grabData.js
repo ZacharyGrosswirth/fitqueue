@@ -18,7 +18,6 @@ export const initUserInfo = async () => {
 
     if (userDocSnap.exists()) {
       const data = userDocSnap.data();
-      // Assign the exported variables
       userName = data.name;
       email = data.email;
       birthday = data.birthday;

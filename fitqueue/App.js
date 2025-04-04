@@ -44,12 +44,11 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    // With persistence enabled, Firebase will return the cached user if available.
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       setLoading(false);
       if (user) {
-        await displayDocumentData(); // Your additional data logic here.
+        await displayDocumentData();
       }
     });
     return unsubscribe;

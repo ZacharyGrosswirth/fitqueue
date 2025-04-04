@@ -4,9 +4,6 @@ import { View, Text, Image, StyleSheet, SafeAreaView } from "react-native";
 import headerLogo from "../assets/header.png";
 
 const Header = ({ gym, text }) => {
-  // Use the provided logo, or a default placeholder image if none is provided.
-  const defaultLogo = headerLogo;
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>

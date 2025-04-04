@@ -69,9 +69,6 @@ const styles = StyleSheet.create({
     color: "#000",
     marginRight: 4,
   },
-  icon: {
-    // Optional icon styling
-  },
   queueList: {
     paddingHorizontal: 16,
     paddingBottom: 8,
