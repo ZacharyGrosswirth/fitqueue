@@ -17,15 +17,17 @@ import {
 //import AsyncStorage from "@react-native-async-storage/async-storage";
 import { auth, db } from "../firebase/firebaseConfig.js";
 import { doc, setDoc } from "firebase/firestore";
+// import * as ImagePicker from "expo-image-picker";
+// import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [name, setName] = useState("");
   const [birthday, setBirthday] = useState(null);
   const [gender, setGender] = useState(null);
+  const [gym, setGym] = useState(null);
 
   const [isFocus, setIsFocus] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -39,6 +41,13 @@ const Signup = () => {
     { label: "Female", value: "Female" },
     { label: "Other", value: "Other" },
     { label: "Prefer Not To Say", value: "Prefer Not To Say" },
+  ];
+
+  const gyms = [
+    { label: "Crunch", value: "Crunch" },
+    { label: "Southwest", value: "Southwest" },
+    { label: "Student Rec", value: "Student Rec" },
+    { label: "Other", value: "Other" },
   ];
 
   useEffect(() => {
@@ -65,28 +74,67 @@ const Signup = () => {
       //     email: user.email,
       //   })
       // );
+      // const imageUri = await pickImage();
+      // let imageURL = "";
+      // if (imageUri) {
+      //   imageURL = await uploadImageAsync(imageUri, user.uid);
+      // }
       await setDoc(doc(db, "Users", user.uid), {
         birthday: birthday,
         email: email,
         gender: gender,
-        gym: "",
-        name: firstName + " " + lastName,
-        picture: ""
+        gym: gym,
+        name: name,
+        // picture: imageURL,
       });
       await setDoc(doc(db, "Users", user.uid, "Workouts", "Push"), {
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       });
       await setDoc(doc(db, "Users", user.uid, "Workouts", "Pull"), {
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       });
       await setDoc(doc(db, "Users", user.uid, "Workouts", "Legs"), {
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       });
     } catch (error) {
       setErrorMessage(error.message);
       console.error("Sign Up error:", error);
     }
   };
+
+  // const pickImage = async () => {
+  //   const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  //   if (status !== "granted") {
+  //     alert("Sorry, we need camera roll permissions to make this work!");
+  //     return null;
+  //   }
+
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //     allowsEditing: true,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //   });
+
+  //   if (result.cancelled) {
+  //     return null;
+  //   }
+
+  //   return result.uri;
+  // };
+
+  // const uploadImageAsync = async (uri, userId) => {
+  //   const response = await fetch(uri);
+  //   const blob = await response.blob();
+
+  //   const storage = getStorage();
+  //   const storageRef = ref(storage, `userProfilePictures/${userId}`);
+
+  //   await uploadBytes(storageRef, blob);
+
+  //   const downloadURL = await getDownloadURL(storageRef);
+  //   return downloadURL;
+  // };
 
   return (
     <View style={styles.container}>
@@ -103,15 +151,7 @@ const Signup = () => {
             style={styles.inputTop}
             value={firstName}
             onChangeText={(text) => setFirstName(text)}
-            placeholder="First Name"
-            autoCapitalize="words"
-          />
-
-          <TextInput
-            style={styles.inputTop}
-            value={lastName}
-            onChangeText={(text) => setLastName(text)}
-            placeholder="Last Name"
+            placeholder="Name"
             autoCapitalize="words"
           />
 
@@ -122,6 +162,34 @@ const Signup = () => {
             placeholder="Email Address"
             keyboardType="email-address"
             autoCapitalize="none"
+          />
+
+          <TextInput
+            style={[styles.inputMiddle, { marginTop: 15 }]}
+            value={birthday}
+            onChangeText={(text) => setBirthday(text)}
+            placeholder="Birthday (MM/DD/YYYY)"
+            autoCapitalize="words"
+          />
+
+          <Dropdown
+            style={styles.dropdown}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            inputSearchStyle={styles.inputSearchStyle}
+            iconStyle={styles.iconStyle}
+            data={gyms}
+            search
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            placeholder={!isFocus ? "Gym" : "..."}
+            searchPlaceholder="Search..."
+            value={gym}
+            onChange={(item) => {
+              setGym(item.value);
+              setIsFocus(false);
+            }}
           />
 
           <Dropdown
