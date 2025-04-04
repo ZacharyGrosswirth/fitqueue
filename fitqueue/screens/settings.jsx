@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,25 +7,35 @@ import {
   Image,
   TouchableOpacity,
   Switch,
+  Modal,
+  TextInput,
+  ActivityIndicator,
 } from "react-native";
 import Header from "../components/header.jsx";
 import profilePicture from "../assets/profile_pic.png";
 import { signOut } from "firebase/auth";
 import { auth, db } from "../firebase/firebaseConfig.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { doc, getDoc } from "firebase/firestore";
-// import * as ImagePicker from "expo-image-picker";
-// import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { userName, email, gender, gym, birthday } from "../firebase/grabData.js";
+import { doc, updateDoc } from "firebase/firestore";
+import { UserContext } from "../firebase/grabData.js";
 
 const Settings = () => {
-  const [isDarkMode, setIsDarkMode] = React.useState(false);
-  // const [email, setEmail] = useState("");
-  // // const [picture, setPicture] = useState(null);
-  // const [name, setName] = useState("");
-  // const [birthday, setBirthday] = useState("");
-  // const [gender, setGender] = useState("");
-  // const [gym, setGym] = useState("");
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { userData, setUserData } = useContext(UserContext);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editBirthday, setEditBirthday] = useState("");
+  const [editGender, setEditGender] = useState("");
+  const [updating, setUpdating] = useState(false);
+
+  // When userData changes, set the edit fields
+  useEffect(() => {
+    if (userData) {
+      setEditName(userData.name || "");
+      setEditBirthday(userData.birthday || "");
+      setEditGender(userData.gender || "");
+    }
+  }, [userData]);
 
   const toggleSwitch = () => setIsDarkMode((previousState) => !previousState);
 
@@ -39,86 +49,42 @@ const Settings = () => {
     }
   };
 
-  // const getUserInfo = async () => {
-  //   try {
-  //     const userDocRef = doc(db, "Users", auth.currentUser.uid);
-  //     const userDocSnap = await getDoc(userDocRef);
-
-  //     if (userDocSnap.exists()) {
-  //       console.log("User data:", userDocSnap.data());
-  //       setEmail(userDocSnap.data().email);
-  //       setName(userDocSnap.data().name);
-  //       setBirthday(userDocSnap.data().birthday);
-  //       setGender(userDocSnap.data().gender);
-  //       setGym(userDocSnap.data().gym);
-  //       // setPicture(userDocSnap.data().picture);
-  //     } else {
-  //       console.log("No such document!");
-  //       return null;
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching user document:", error);
-  //   }
-  // };
-
-  // const pickImage = async () => {
-  //     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  //     if (status !== "granted") {
-  //       alert("Sorry, we need camera roll permissions to make this work!");
-  //       return null;
-  //     }
-  
-  //     let result = await ImagePicker.launchImageLibraryAsync({
-  //       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-  //       allowsEditing: true,
-  //       aspect: [4, 3],
-  //       quality: 1,
-  //     });
-  
-  //     if (result.cancelled) {
-  //       return null;
-  //     }
-  
-  //     return result.uri;
-  //   };
-  
-  //   const uploadImageAsync = async (uri, userId) => {
-  //     const response = await fetch(uri);
-  //     const blob = await response.blob();
-  
-  //     const storage = getStorage();
-  //     const storageRef = ref(storage, `userProfilePictures/${userId}`);
-  
-  //     await uploadBytes(storageRef, blob);
-  
-  //     const downloadURL = await getDownloadURL(storageRef);
-  //     return downloadURL;
-  //   };
-
-  // useEffect(() => {
-  //   getUserInfo();
-  // }, []);
+  const handleSaveEdits = async () => {
+    setUpdating(true);
+    try {
+      const userRef = doc(db, "Users", auth.currentUser.uid);
+      // Prepare the updated fields
+      const updatedFields = {
+        name: editName,
+        birthday: editBirthday,
+        gender: editGender,
+      };
+      await updateDoc(userRef, updatedFields);
+      // Optionally update your context manually if not relying on onSnapshot:
+      setUserData((prevData) => ({ ...prevData, ...updatedFields }));
+      setModalVisible(false);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <Header gym={gym} text="Settings" />
-      <ScrollView contentContainerStyle={styles.contentContainer}>
+      <Header gym={userData?.gym} text="Settings" />
+      <View style={styles.contentContainer}>
         <Text style={styles.sectionHeader}>Name</Text>
-        <Text style={styles.sectionText}>{userName}</Text>
+        <Text style={styles.sectionText}>{userData?.name}</Text>
         <Text style={styles.sectionHeader}>Email</Text>
-        <Text style={styles.sectionText}>{email}</Text>
+        <Text style={styles.sectionText}>{userData?.email}</Text>
         <Text style={styles.sectionHeader}>Birthday</Text>
-        <Text style={styles.sectionText}>{birthday}</Text>
+        <Text style={styles.sectionText}>{userData?.birthday}</Text>
         <Text style={styles.sectionHeader}>Gender</Text>
-        <Text style={styles.sectionText}>{gender}</Text>
+        <Text style={styles.sectionText}>{userData?.gender}</Text>
         <Text style={styles.sectionHeader}>Home Gym</Text>
-        <Text style={styles.sectionText}>{gym}</Text>
-        {/* <Text style={styles.sectionHeader}>Profile Picture</Text>
-        {picture ? (
-          <Image style={styles.profileImage} source={{ uri: picture }} />
-        ) : (
-          <View style={styles.profileImage}>{profilePicture}</View>
-        )} */}
+        <Text style={styles.sectionText}>{userData?.gym}</Text>
+
         <View style={styles.toggleContainer}>
           <Text style={styles.toggleLabel}>Dark Mode</Text>
           <Switch
@@ -129,18 +95,68 @@ const Settings = () => {
           />
         </View>
 
-        <TouchableOpacity style={styles.editButton}>
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => setModalVisible(true)}
+        >
           <Text style={styles.editButtonText}>Edit</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={async () => {
-            await handleLogout();
-          }}
-        >
+
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.editButtonText}>Logout</Text>
         </TouchableOpacity>
-      </ScrollView>
+      </View>
+
+      <Modal visible={modalVisible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalHeader}>Edit Profile</Text>
+
+            <Text style={styles.modalLabel}>Name</Text>
+            <TextInput
+              style={styles.modalInput}
+              value={editName}
+              onChangeText={setEditName}
+              placeholder="Enter your name"
+            />
+
+            <Text style={styles.modalLabel}>Birthday</Text>
+            <TextInput
+              style={styles.modalInput}
+              value={editBirthday}
+              onChangeText={setEditBirthday}
+              placeholder="Enter your birthday"
+            />
+
+            <Text style={styles.modalLabel}>Gender</Text>
+            <TextInput
+              style={styles.modalInput}
+              value={editGender}
+              onChangeText={setEditGender}
+              placeholder="Enter your gender"
+            />
+
+            {updating ? (
+              <ActivityIndicator size="large" color="#36BCC0" />
+            ) : (
+              <View style={styles.modalButtonContainer}>
+                <TouchableOpacity
+                  style={[styles.modalButton, { backgroundColor: "#36BCC0" }]}
+                  onPress={handleSaveEdits}
+                >
+                  <Text style={styles.modalButtonText}>Save</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, { backgroundColor: "#737373" }]}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={styles.modalButtonText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -166,11 +182,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginLeft: 10,
   },
-  profileImage: {
-    width: 173,
-    height: 173,
-    marginLeft: 15,
-  },
   toggleContainer: {
     marginVertical: 20,
   },
@@ -179,23 +190,18 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontWeight: "bold",
   },
-  editContainer: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginRight: 10,
-    marginBottom: 10,
-  },
   editButton: {
     backgroundColor: "#36BCC0",
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: "center",
+    marginTop: 0,
   },
   editButtonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
-    alignSelf: "center"
+    textAlign: "center",
   },
   logoutButton: {
     backgroundColor: "#737373",
@@ -203,5 +209,51 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginTop: 10,
+  },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: "80%",
+    backgroundColor: "#FFF",
+    borderRadius: 10,
+    padding: 20,
+  },
+  modalHeader: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  modalLabel: {
+    fontSize: 16,
+    marginTop: 10,
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 10,
+    marginTop: 5,
+  },
+  modalButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+  },
+  modalButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 5,
+    marginHorizontal: 5,
+  },
+  modalButtonText: {
+    color: "#FFF",
+    textAlign: "center",
+    fontWeight: "bold",
   },
 });

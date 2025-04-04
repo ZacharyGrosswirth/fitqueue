@@ -32,11 +32,12 @@ export const UserProvider = ({ children }) => {
     const unsubscribe = onSnapshot(userRef, (docSnap) => {
       if (docSnap.exists()) {
         setUserData(docSnap.data());
-        setUserName(docSnap.data().userName);
+        setUserName(docSnap.data().name);
         setEmail(docSnap.data().email);
         setBirthday(docSnap.data().birthday);
         setGender(docSnap.data().gender);
         setGym(docSnap.data().gym);
+        console.log(userData);
       }
       setLoading(false);
     });
