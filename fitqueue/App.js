@@ -33,19 +33,6 @@ const App = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        await initUserInfo();
-      } else {
-        console.log("No authenticated user found.");
-      }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       setLoading(false);
       if (user) {
@@ -65,99 +52,103 @@ const App = () => {
 
   return (
     <UserProvider>
-    <NavigationContainer>
-      {user ? (
-        <Tab.Navigator
-          screenOptions={{
-            tabBarStyle: { backgroundColor: "#36BCC0" },
-            headerStyle: { backgroundColor: "#36BCC0" },
-            tabBarActiveTintColor: "white",
-            tabBarInactiveTintColor: "grey",
-            headerTintColor: "white",
-          }}
-        >
-          <Tab.Screen
-            name="Home"
-            component={Home}
-            options={{
-              headerShown: false,
-              tabBarIcon: ({ color, size }) => (
-                <FontAwesomeIcon icon={faHome} color={color} size={size} />
-              ),
-              headerStyle: {
-                backgroundColor: "#1f1f1f",
-                borderBottomWidth: 0,
-              },
+      <NavigationContainer>
+        {user ? (
+          <Tab.Navigator
+            screenOptions={{
+              tabBarStyle: { backgroundColor: "#36BCC0" },
+              headerStyle: { backgroundColor: "#36BCC0" },
+              tabBarActiveTintColor: "white",
+              tabBarInactiveTintColor: "grey",
               headerTintColor: "white",
-              headerShadowVisible: false,
-              headerBackTitleVisible: false,
             }}
-          />
-          <Tab.Screen
-            name="Queues"
-            component={Queues}
-            options={{
-              headerShown: false,
-              tabBarIcon: ({ color, size }) => (
-                <FontAwesomeIcon icon={faUser} color={color} size={size} />
-              ),
-            }}
-          />
-          <Tab.Screen
-            name="Workouts"
-            component={Workouts}
-            options={{
-              headerShown: false,
-              tabBarIcon: ({ color, size }) => (
-                <FontAwesomeIcon
-                  icon={faPersonRunning}
-                  color={color}
-                  size={size}
-                />
-              ),
-            }}
-          />
-          <Tab.Screen
-            name="Gyms"
-            component={Gyms}
-            options={{
-              headerShown: false,
-              tabBarIcon: ({ color, size }) => (
-                <FontAwesomeIcon icon={faDumbbell} color={color} size={size} />
-              ),
-            }}
-          />
-          <Tab.Screen
-            name="Settings"
-            component={Settings}
-            options={{
-              headerShown: false,
-              tabBarIcon: ({ color, size }) => (
-                <FontAwesomeIcon icon={faCog} color={color} size={size} />
-              ),
-            }}
-          />
-        </Tab.Navigator>
-      ) : (
-        <Stack.Navigator initialRouteName="Login">
-          <Stack.Screen
-            name="Login"
-            component={Login}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="SignUp"
-            component={Signup}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="ForgotPassword"
-            component={ForgotPassword}
-            options={{ headerShown: false }}
-          />
-        </Stack.Navigator>
-      )}
-    </NavigationContainer>
+          >
+            <Tab.Screen
+              name="Home"
+              component={Home}
+              options={{
+                headerShown: false,
+                tabBarIcon: ({ color, size }) => (
+                  <FontAwesomeIcon icon={faHome} color={color} size={size} />
+                ),
+                headerStyle: {
+                  backgroundColor: "#1f1f1f",
+                  borderBottomWidth: 0,
+                },
+                headerTintColor: "white",
+                headerShadowVisible: false,
+                headerBackTitleVisible: false,
+              }}
+            />
+            <Tab.Screen
+              name="Queues"
+              component={Queues}
+              options={{
+                headerShown: false,
+                tabBarIcon: ({ color, size }) => (
+                  <FontAwesomeIcon icon={faUser} color={color} size={size} />
+                ),
+              }}
+            />
+            <Tab.Screen
+              name="Workouts"
+              component={Workouts}
+              options={{
+                headerShown: false,
+                tabBarIcon: ({ color, size }) => (
+                  <FontAwesomeIcon
+                    icon={faPersonRunning}
+                    color={color}
+                    size={size}
+                  />
+                ),
+              }}
+            />
+            <Tab.Screen
+              name="Gyms"
+              component={Gyms}
+              options={{
+                headerShown: false,
+                tabBarIcon: ({ color, size }) => (
+                  <FontAwesomeIcon
+                    icon={faDumbbell}
+                    color={color}
+                    size={size}
+                  />
+                ),
+              }}
+            />
+            <Tab.Screen
+              name="Settings"
+              component={Settings}
+              options={{
+                headerShown: false,
+                tabBarIcon: ({ color, size }) => (
+                  <FontAwesomeIcon icon={faCog} color={color} size={size} />
+                ),
+              }}
+            />
+          </Tab.Navigator>
+        ) : (
+          <Stack.Navigator initialRouteName="Login">
+            <Stack.Screen
+              name="Login"
+              component={Login}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="SignUp"
+              component={Signup}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="ForgotPassword"
+              component={ForgotPassword}
+              options={{ headerShown: false }}
+            />
+          </Stack.Navigator>
+        )}
+      </NavigationContainer>
     </UserProvider>
   );
 };

@@ -3,10 +3,8 @@ import React, { createContext, useState, useEffect } from "react";
 import { auth, db } from "./firebaseConfig.js";
 import { doc, onSnapshot } from "firebase/firestore";
 
-// Create the context
 export const UserContext = createContext();
 
-// Create a provider component
 export const UserProvider = ({ children }) => {
   const [userData, setUserData] = useState({
     userName: null,
@@ -37,7 +35,6 @@ export const UserProvider = ({ children }) => {
         setBirthday(docSnap.data().birthday);
         setGender(docSnap.data().gender);
         setGym(docSnap.data().gym);
-        console.log(userData);
       }
       setLoading(false);
     });

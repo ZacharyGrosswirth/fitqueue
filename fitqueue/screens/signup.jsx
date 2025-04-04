@@ -149,7 +149,7 @@ const Signup = () => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.inputTop}
-            value={firstName}
+            value={name}
             onChangeText={(text) => setName(text)}
             placeholder="Name"
             autoCapitalize="words"
