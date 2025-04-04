@@ -37,14 +37,16 @@ const Settings = () => {
           <Switch
             onValueChange={toggleSwitch}
             value={isDarkMode}
-            trackColor={{false: "#767577", true: "#3CCFCF"}}
-            thumbColor={isDarkMode ? "#ffffff" : "#3CCFCF"}
+            trackColor={{ false: "#767577", true: "#36BCC0" }}
+            thumbColor={isDarkMode ? "#FFF" : "#36BCC0"}
           />
         </View>
 
-        <TouchableOpacity style={styles.editButton}>
-          <Text style={styles.editButtonText}>Edit</Text>
-        </TouchableOpacity>
+        <View style={styles.editContainer}>
+          <TouchableOpacity style={styles.editButton}>
+            <Text style={styles.editButtonText}>Edit</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );
@@ -59,6 +61,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 20,
+    marginTop: -15,
   },
   sectionHeader: {
     fontSize: 20,
@@ -70,34 +73,36 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginLeft: 10,
   },
-  text: {
-    fontSize: 32,
-    fontWeight: "bold",
-  },
   profileImage: {
     width: 173,
     height: 173,
     marginLeft: 15,
   },
   toggleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
     marginVertical: 20,
   },
   toggleLabel: {
-    fontSize: 18,
+    fontSize: 20,
+    marginBottom: 10,
     fontWeight: "bold",
   },
+  editContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginRight: 10,
+    marginBottom: 10,
+  },
   editButton: {
-    backgroundColor: "#3CCFCF",
-    paddingVertical: 12,
+    backgroundColor: "#36BCC0",
+    width: "35%",
+    height: "35%",
+    justifyContent: "center",
     borderRadius: 10,
-    alignItems: "center",
   },
   editButtonText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
+    alignSelf: "center"
   },
 });
