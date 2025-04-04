@@ -150,7 +150,7 @@ const Signup = () => {
           <TextInput
             style={styles.inputTop}
             value={firstName}
-            onChangeText={(text) => setFirstName(text)}
+            onChangeText={(text) => setName(text)}
             placeholder="Name"
             autoCapitalize="words"
           />
