@@ -103,7 +103,7 @@ const Settings = () => {
     <View style={styles.container}>
       <Header gym={gym} text="Settings" />
       <ScrollView contentContainerStyle={styles.contentContainer}>
-        <Text style={[styles.sectionHeader, { marginTop: 0 }]}>Name</Text>
+        <Text style={styles.sectionHeader}>Name</Text>
         <Text style={styles.sectionText}>{userName}</Text>
         <Text style={styles.sectionHeader}>Email</Text>
         <Text style={styles.sectionText}>{email}</Text>
@@ -187,10 +187,9 @@ const styles = StyleSheet.create({
   },
   editButton: {
     backgroundColor: "#36BCC0",
-    width: "35%",
-    height: "35%",
-    justifyContent: "center",
+    paddingVertical: 12,
     borderRadius: 10,
+    alignItems: "center",
   },
   editButtonText: {
     color: "#fff",
