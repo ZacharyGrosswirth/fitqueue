@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -31,30 +31,20 @@ const App = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser);
-        await AsyncStorage.setItem(
-          "user",
-          JSON.stringify({
-            uid: firebaseUser.uid,
-            email: firebaseUser.email,
-          })
-        );
-      } else {
-        const cachedUser = await AsyncStorage.getItem("user");
-        if (cachedUser) {
-          setUser(JSON.parse(cachedUser));
-        }
-      }
+    // With persistence enabled, Firebase will return the cached user if available.
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setUser(user);
       setLoading(false);
+      if (user) {
+        await displayDocumentData(); // Your additional data logic here.
+      }
     });
     return unsubscribe;
   }, []);
 
   if (loading) {
     return (
-      <View style={{ flex:1, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <ActivityIndicator size="large" />
       </View>
     );

@@ -10,17 +10,33 @@ import {
 } from "react-native";
 import Header from "../components/header.jsx";
 import profilePicture from "../assets/profile_pic.png";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase/firebaseConfig";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
 const Settings = () => {
   const [isDarkMode, setIsDarkMode] = React.useState(false);
 
-  const toggleSwitch = () => setIsDarkMode((previousState) => !previousState)
+  const navigation = useNavigation();
+
+  const toggleSwitch = () => setIsDarkMode((previousState) => !previousState);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      await AsyncStorage.removeItem("user");
+      console.log("User logged out and cache cleared.");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Header gym="Southwest Recreation Center" text="Settings" />
       <ScrollView contentContainerStyle={styles.contentContainer}>
-        <Text style={styles.sectionHeader}>Name</Text>
+        <Text style={[styles.sectionHeader, { marginTop: 0 }]}>Name</Text>
         <Text style={styles.sectionText}>Brianna Cacciatore</Text>
         <Text style={styles.sectionHeader}>Email</Text>
         <Text style={styles.sectionText}>bricacciatore@ufl.edu</Text>
@@ -37,13 +53,21 @@ const Settings = () => {
           <Switch
             onValueChange={toggleSwitch}
             value={isDarkMode}
-            trackColor={{false: "#767577", true: "#3CCFCF"}}
+            trackColor={{ false: "#767577", true: "#3CCFCF" }}
             thumbColor={isDarkMode ? "#ffffff" : "#3CCFCF"}
           />
         </View>
 
         <TouchableOpacity style={styles.editButton}>
           <Text style={styles.editButtonText}>Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={async () => {
+            await handleLogout();
+          }}
+        >
+          <Text style={styles.editButtonText}>Logout</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -99,5 +123,12 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  logoutButton: {
+    backgroundColor: "#737373",
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 10,
   },
 });

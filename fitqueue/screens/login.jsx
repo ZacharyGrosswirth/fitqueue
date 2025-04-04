@@ -10,7 +10,7 @@ import {
 import { Icon } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+//import AsyncStorage from "@react-native-async-storage/async-storage";
 import { auth } from "../firebase/firebaseConfig.js";
 
 const Login = () => {
@@ -38,13 +38,13 @@ const Login = () => {
         password
       );
       const user = userCredential.user;
-      await AsyncStorage.setItem(
-        "user",
-        JSON.stringify({
-          uid: user.uid,
-          email: user.email,
-        })
-      );
+      // await AsyncStorage.setItem(
+      //   "user",
+      //   JSON.stringify({
+      //     uid: user.uid,
+      //     email: user.email,
+      //   })
+      // );
     } catch (error) {
       setErrorMessage(error.message);
       console.error("Login error:", error);

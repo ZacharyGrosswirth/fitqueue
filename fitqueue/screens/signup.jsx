@@ -14,8 +14,9 @@ import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
 } from "firebase/auth";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { auth } from "../firebase/firebaseConfig.js";
+//import AsyncStorage from "@react-native-async-storage/async-storage";
+import { auth, db } from "../firebase/firebaseConfig.js";
+import { doc, setDoc } from "firebase/firestore";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -57,13 +58,30 @@ const Signup = () => {
         password
       );
       const user = userCredential.user;
-      await AsyncStorage.setItem(
-        "user",
-        JSON.stringify({
-          uid: user.uid,
-          email: user.email,
-        })
-      );
+      // await AsyncStorage.setItem(
+      //   "user",
+      //   JSON.stringify({
+      //     uid: user.uid,
+      //     email: user.email,
+      //   })
+      // );
+      await setDoc(doc(db, "Users", user.uid), {
+        birthday: birthday,
+        email: email,
+        gender: gender,
+        gym: "",
+        name: firstName + " " + lastName,
+        picture: ""
+      });
+      await setDoc(doc(db, "Users", user.uid, "Workouts", "Push"), {
+        createdAt: new Date().toISOString()
+      });
+      await setDoc(doc(db, "Users", user.uid, "Workouts", "Pull"), {
+        createdAt: new Date().toISOString()
+      });
+      await setDoc(doc(db, "Users", user.uid, "Workouts", "Legs"), {
+        createdAt: new Date().toISOString()
+      });
     } catch (error) {
       setErrorMessage(error.message);
       console.error("Sign Up error:", error);
