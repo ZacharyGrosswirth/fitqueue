@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,12 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { Dropdown } from "react-native-element-dropdown";
 import { Icon } from "react-native-elements";
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+} from "firebase/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { auth } from "../firebase/firebaseConfig.js";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -23,6 +29,7 @@ const Signup = () => {
   const [isFocus, setIsFocus] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [verifyPasswordVisible, setVerifyPasswordVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const navigation = useNavigation();
 
@@ -33,19 +40,34 @@ const Signup = () => {
     { label: "Prefer Not To Say", value: "Prefer Not To Say" },
   ];
 
-  const handleSignUpPress = async () => {
-    // const signUpResult = await handleSignUp(
-    //   email,
-    //   password,
-    //   role,
-    //   donorDriveLink,
-    //   expoPushToken
-    // );
-    // if (signUpResult === "success") {
-    //   setSignUpField(false);
-    // } else {
-    //   setSignUpField(true);
-    // }
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        navigation.navigate("Home");
+      }
+    });
+    return unsubscribe;
+  }, [navigation]);
+
+  const handleSignUp = async () => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      await AsyncStorage.setItem(
+        "user",
+        JSON.stringify({
+          uid: user.uid,
+          email: user.email,
+        })
+      );
+    } catch (error) {
+      setErrorMessage(error.message);
+      console.error("Sign Up error:", error);
+    }
   };
 
   return (
@@ -126,7 +148,7 @@ const Signup = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={[styles.passwordContainer, {marginTop: 1}]}>
+        <View style={[styles.passwordContainer, { marginTop: 1 }]}>
           <TextInput
             style={styles.inputMiddle}
             value={verifyPassword}
@@ -150,7 +172,7 @@ const Signup = () => {
         <TouchableOpacity
           style={styles.createAccountButton}
           onPress={async () => {
-            await handleSignUpPress();
+            await handleSignUp();
           }}
         >
           <Text style={styles.buttonText}>Sign Up</Text>
@@ -169,6 +191,7 @@ const Signup = () => {
           </TouchableOpacity>
         </Text>
       </View>
+      {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
     </View>
   );
 };
@@ -225,22 +248,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: "5%",
   },
-  inputBottom: {
-    height: 40,
-    borderColor: "black",
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    backgroundColor: "#D9D9D9",
-    marginTop: 15,
-  },
-  loginButton: {
-    backgroundColor: "#E2883C",
-    padding: 15,
-    borderRadius: 5,
-    alignSelf: "stretch",
-    marginBottom: 10,
-  },
   createAccountButton: {
     backgroundColor: "#36BCC0",
     padding: 15,
@@ -260,36 +267,10 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
     marginVertical: 12,
   },
-  forgotPassword: {
-    color: "#61A0DA",
-    textAlign: "center",
-  },
-  DDlink: {
-    color: "#61A0DA",
-    textAlign: "center",
-    marginBottom: 2,
-  },
   signUp: {
     color: "black",
     textAlign: "center",
     marginTop: 5,
-  },
-  logoBig: {
-    width: 350,
-    height: 225,
-    marginBottom: 50,
-  },
-  logoSmall: {
-    width: 350,
-    height: 225,
-    marginBottom: 50,
-    marginTop: 50,
-  },
-  errorMessage: {
-    color: "white",
-    textAlign: "center",
-    marginTop: 15,
-    marginBottom: 15,
   },
   dropdown: {
     marginTop: 15,
@@ -318,43 +299,14 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 16,
   },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 22,
-  },
-  modalHeader: {
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  modalText: {
-    fontSize: 14,
-    textAlign: "left",
-    alignSelf: "stretch",
-    marginBottom: 5,
-  },
   topText: {
     width: "70%",
     textAlign: "center",
     marginBottom: 15,
     color: "white",
+  },
+  error: {
+    color: "red",
+    marginTop: 15,
   },
 });
