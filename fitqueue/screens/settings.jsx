@@ -204,11 +204,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
   },
-  logoutButton: {
-    backgroundColor: "#737373",
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 10,
-  },
 });
