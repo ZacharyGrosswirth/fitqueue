@@ -1,16 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { auth, db } from "../firebase/firebaseConfig.js";
 import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import "firebase/firestore";
-import { userName, email, gender, gym, birthday } from "../firebase/grabData.js";
+import { UserContext } from "../firebase/grabData.js";
 
 const HomeItem = ({
   name = "Leg Press",
   waitTime = "20 minutes",
 }) => {
-  // 0: Join Queue, 1: Queue Joined, 2: Using Equipment
   const [queueState, setQueueState] = useState(0);
+  const { userName, email, gender, gym, birthday } = useContext(UserContext);
 
   const toggleQueue = async () => {
     console.log(`Current state: ${queueState} for ${name}...`);

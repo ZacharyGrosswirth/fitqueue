@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { UserContext } from "../firebase/grabData.js";
 
 const WorkoutQueue = ({
   title = "Leg Press",
@@ -8,6 +9,7 @@ const WorkoutQueue = ({
   queue = ["Bob", "Zach", "Misha", "You", "Brianna", "Katie"],
 }) => {
   const [collapsed, setCollapsed] = useState(true);
+  const { userName, email, gender, gym, birthday } = useContext(UserContext);
 
   const handleToggle = () => {
     setCollapsed(!collapsed);

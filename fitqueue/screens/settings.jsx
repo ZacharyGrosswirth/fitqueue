@@ -53,14 +53,12 @@ const Settings = () => {
     setUpdating(true);
     try {
       const userRef = doc(db, "Users", auth.currentUser.uid);
-      // Prepare the updated fields
       const updatedFields = {
         name: editName,
         birthday: editBirthday,
         gender: editGender,
       };
       await updateDoc(userRef, updatedFields);
-      // Optionally update your context manually if not relying on onSnapshot:
       setUserData((prevData) => ({ ...prevData, ...updatedFields }));
       setModalVisible(false);
     } catch (error) {

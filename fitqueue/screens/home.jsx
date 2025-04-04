@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import { userName, email, gender, gym, birthday } from "../firebase/grabData.js";
 
