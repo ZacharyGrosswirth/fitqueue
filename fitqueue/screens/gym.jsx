@@ -45,26 +45,26 @@ const Gym = () => {
       <View>
         <View style={{ flexDirection: "row", justifyContent: "space-around", marginLeft: 30, marginRight: 30 }}>
           <View style={{ flexDirection: "column" }}>
-            <TouchableOpacity style={styles.infoButton}>
+            <TouchableOpacity style={[styles.infoButton, { width: 150 }]}>
               <Text style={styles.infoText}>Staff</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.infoButton}>
+            <TouchableOpacity style={[styles.infoButton, { width: 150 }]}>
               <Text style={styles.infoText}>Classes</Text>
             </TouchableOpacity>
           </View>
           <View style={{ flexDirection: "column" }}>
-            <TouchableOpacity style={styles.infoButton}>
+            <TouchableOpacity style={[styles.infoButton, { width: 150 }]}>
               <Text style={styles.infoText}>Trainers</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.infoButton}>
+            <TouchableOpacity style={[styles.infoButton, { width: 150 }]}>
               <Text style={styles.infoText}>Other</Text>
             </TouchableOpacity>
           </View>
         </View>
       </View>
 
-      <View style={{ flexDirection: "row", justifyContent: "flex-end", marginRight: 10 }}>
-        <TouchableOpacity style={styles.editButton}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: -30 }}>
+        <TouchableOpacity style={[styles.editButton, { width: "70%" }]}>
           <Text style={styles.editText}>Edit</Text>
         </TouchableOpacity>
       </View>
@@ -111,10 +111,9 @@ const styles = StyleSheet.create({
   },
   editButton: {
     backgroundColor: "#36BCC0",
-    width: "35%",
-    height: "35%",
-    justifyContent: "center",
+    paddingVertical: 12,
     borderRadius: 10,
+    alignItems: "center",
   },
   editText: {
     fontSize: 17,
