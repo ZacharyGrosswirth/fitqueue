@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { userName, email, gender, gym, birthday } from "../firebase/grabData.js";
+
 
 import Header from "../components/header.jsx";
 import WorkoutItem from "../components/workout_config.jsx";
@@ -33,7 +35,7 @@ const workout2 = [
 const Workouts = () => {
   return (
     <View style={styles.container}>
-      <Header gym="Southwest Recreation Center" text="Your Workouts" />
+      <Header gym={gym} text="Your Workouts" />
       <WorkoutItem title="Push" exercises={workout0}></WorkoutItem>
       <WorkoutItem title="Pull" exercises={workout1}></WorkoutItem>
       <WorkoutItem title="Legs" exercises={workout2}></WorkoutItem>

@@ -5,7 +5,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase/firebaseConfig.js";
-import { initUserInfo } from "./firebase/grabData.js";
+// import { initUserInfo } from "./firebase/grabData.js";
+import { UserProvider } from "./firebase/grabData.js";
 
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHome } from "@fortawesome/free-solid-svg-icons";
@@ -63,6 +64,7 @@ const App = () => {
   }
 
   return (
+    <UserProvider>
     <NavigationContainer>
       {user ? (
         <Tab.Navigator
@@ -156,6 +158,7 @@ const App = () => {
         </Stack.Navigator>
       )}
     </NavigationContainer>
+    </UserProvider>
   );
 };
 

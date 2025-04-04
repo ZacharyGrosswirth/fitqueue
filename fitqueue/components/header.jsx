@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, Text, Image, StyleSheet, SafeAreaView } from "react-native";
+import { UserContext } from "../firebase/grabData.js";
 
 import headerLogo from "../assets/header.png";
 
-const Header = ({ gym, text }) => {
+const Header = ({ text }) => {
+
+  const { userName, email, birthday, gender, gym } = useContext(UserContext);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>

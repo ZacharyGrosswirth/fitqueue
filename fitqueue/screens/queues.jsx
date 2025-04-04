@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { userName, email, gender, gym, birthday } from "../firebase/grabData.js";
+
 
 import Header from "../components/header.jsx";
 import WorkoutQueue from "../components/queue_config.jsx";
@@ -10,7 +12,7 @@ const queue1 = ["Bob", "Zach"]
 const Queues = () => {
   return (
     <View style={styles.container}>
-      <Header gym="Southwest Recreation Center" text="Joined Queues"/>
+      <Header gym={gym} text="Joined Queues"/>
       <WorkoutQueue title="Leg Press" waitTime="20 Minutes" queue={queue0}></WorkoutQueue>
       <WorkoutQueue title="Squat" waitTime="10 Minutes" queue={queue1}></WorkoutQueue>
     </View>

@@ -1,5 +1,6 @@
 import React from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
+import { userName, email, gender, gym, birthday } from "../firebase/grabData.js";
 
 import Header from "../components/header.jsx";
 import HomeItem from "../components/home_config.jsx";
@@ -7,7 +8,7 @@ import HomeItem from "../components/home_config.jsx";
 const Home = () => {
   return (
     <View style={styles.container}>
-      <Header gym="Southwest Recreation Center" text="Today's Workout"/>
+      <Header gym={gym} text="Today's Workout"/>
       <ScrollView>
         <HomeItem
           name="Leg Press"
